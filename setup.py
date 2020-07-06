@@ -7,13 +7,13 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setuptools.setup(
     name="side-kick",
-    version="0.1.16",
+    version="0.0.1",
     author="Ben Currie",
     author_email="benjamin.w.currie@gmail.com",
     description="A lightweight task runner for django with easy admin controls",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url="https://github.com/CurrieBen/sidekick",
+    url="https://github.com/Natoora/side-kick",
     license="MIT License",
     packages=setuptools.find_packages(),
     classifiers=[
