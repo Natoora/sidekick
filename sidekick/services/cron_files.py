@@ -18,16 +18,17 @@ class CronService:
                 getattr(settings, "SIDEKICK")['CRON_PATH']]):
             self.manage_path = settings.SIDEKICK['MANAGE_PATH']
         else:
-            logger.error(msg="Missing one of SIDEKICK_REGISTERED_APPS, MANAGE_PATH or CRON_PATH in "
-                             "settings file.")
-            print('Make sure you have SIDEKICK_REGISTERED_APPS, MANAGE_PATH and CRON_PATH in your '
-                  'settings file')
+            logger.error(
+                msg="Missing one of SIDEKICK_REGISTERED_APPS, MANAGE_PATH or CRON_PATH in settings file."
+            )
 
     def write_cron_file(self, tasks):
         """For each task in list, write to the cron file. """
 
         with open(settings.SIDEKICK['CRON_PATH'], 'w+') as ws_cron_file:
+            logger.info('Cron file opened at: ', settings.SIDEKICK['CRON_PATH'])
             for task in tasks:
+                logger.info('Writing task to file: ', task.name)
                 ws_cron_file.write(
                     "# {name}\n"
                     "{schedule} {manage_path} {task}\n\n".format(
