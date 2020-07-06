@@ -14,13 +14,13 @@ class CronService:
 
     def __init__(self):
         if all([getattr(settings, "SIDEKICK")['SIDEKICK_REGISTERED_APPS'],
-                getattr(settings, "SIDEKICK")['DJANGO_PATH'],
+                getattr(settings, "SIDEKICK")['MANAGE_PATH'],
                 getattr(settings, "SIDEKICK")['CRON_PATH']]):
-            self.django_path = settings.SIDEKICK['DJANGO_PATH']
+            self.manage_path = settings.SIDEKICK['MANAGE_PATH']
         else:
-            logger.error(msg="Missing one of SIDEKICK_REGISTERED_APPS, DJANGO_PATH or CRON_PATH in "
+            logger.error(msg="Missing one of SIDEKICK_REGISTERED_APPS, MANAGE_PATH or CRON_PATH in "
                              "settings file.")
-            print('Make sure you have SIDEKICK_REGISTERED_APPS, DJANGO_PATH and CRON_PATH in your '
+            print('Make sure you have SIDEKICK_REGISTERED_APPS, MANAGE_PATH and CRON_PATH in your '
                   'settings file')
 
     def write_cron_file(self, tasks):
@@ -30,10 +30,10 @@ class CronService:
             for task in tasks:
                 ws_cron_file.write(
                     "# {name}\n"
-                    "{schedule} {django_path} {task}\n\n".format(
+                    "{schedule} {manage_path} {task}\n\n".format(
                         name=task.name,
                         schedule=task.cron_schedule.schedule(),
-                        django_path=self.django_path,
+                        manage_path=self.manage_path,
                         task=task.registered_task.task_name)
                 )
 
