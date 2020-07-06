@@ -34,6 +34,7 @@ class Task(models.Model):
 
     def save(self, *args, **kwargs):
         """Task Pre Save"""
+        logger.info("Sidekick task saved: {}".format(self.name))
         if not self.registered_task or not self.cron_schedule:
             self.enabled = False
 
