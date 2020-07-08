@@ -1,6 +1,4 @@
 import logging
-import os
-import stat
 
 from django.conf import settings
 
@@ -40,7 +38,6 @@ class CronService:
                         manage_path=self.manage_path,
                         task=task.registered_task.task_name)
                 )
-        os.chmod(cron_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)  # Make file executable
 
     def generate_cron_tasks(self):
         """Create a new cron file on the post save of a Registered Task"""
