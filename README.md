@@ -1,19 +1,14 @@
 # Side Kick
 
-Side Kick is a simple, lightweight scheduler for Django management commands. Anything can be a management command, whether it is doing database back ups or sending emails. 
-Simply create the task, add the decorator and then in Django's admin you can set when it should run and also enable or 
-disable it. It will also make sure that the task will only run if there is no other instance of the task already running
-to avoid unexpected issues if a task takes longer to complete than expected.
+Side Kick is a simple scheduler for Django management commands.  Simply create the task, add the decorator and then 
+set when it should run from Django's admin. 
 
 
 Installation:
 
-``pip install side-kick``
+``pip install git+https://github.com/Natoora/sidekick.git``
 
 Make sure you add ``sidekick`` to your installed apps.
-
-Create a file somewhere within the project called ``tasks.txt``. The file can be wherever you want, as long as it is
-inside the main project directory. This is where the tasks will be written to, which will be explained shortly.
 
 Add the following to your settings file:
 
