@@ -32,7 +32,7 @@ class CronService:
             for task in tasks:
                 ws_cron_file.write(
                     "# {name}\n"
-                    "{schedule} {manage_path} {task}\n\n".format(
+                    "{schedule} . /root/.profile && {manage_path} {task}\n\n".format(
                         name=task.name,
                         schedule=task.cron_schedule.schedule(),
                         manage_path=self.manage_path,
