@@ -1,4 +1,6 @@
 import logging
+import os
+import stat
 
 from django.conf import settings
 
@@ -23,9 +25,11 @@ class CronService:
             )
 
     def write_cron_file(self, tasks):
-        """For each task in list, write to the cron file. """
-
-        with open(settings.SIDEKICK['CRON_PATH'], 'w+') as ws_cron_file:
+        """
+        For each task instance, write line to file formatted for Cron.
+        """
+        cron_path = settings.SIDEKICK['CRON_PATH']
+        with open(cron_path, 'w+') as ws_cron_file:
             logger.info('Cron file opened at: ', settings.SIDEKICK['CRON_PATH'])
             for task in tasks:
                 logger.info('Writing task to file: ', task.name)
@@ -37,6 +41,7 @@ class CronService:
                         manage_path=self.manage_path,
                         task=task.registered_task.task_name)
                 )
+        os.chmod(cron_path, stat.S_IEXEC)  # Make file executable
 
     def generate_cron_tasks(self):
         """Create a new cron file on the post save of a Registered Task"""
