@@ -32,7 +32,6 @@ class CronService:
         with open(cron_path, 'w+') as ws_cron_file:
             logger.info('Writing Sidekick Cron file: ', cron_path)
             for task in tasks:
-                logger.info('Writing task to file: ', task.name)
                 ws_cron_file.write(
                     "# {name}\n"
                     "{schedule} {manage_path} {task}\n\n".format(
@@ -41,7 +40,7 @@ class CronService:
                         manage_path=self.manage_path,
                         task=task.registered_task.task_name)
                 )
-        os.chmod(cron_path, stat.S_IEXEC)  # Make file executable
+        os.chmod(cron_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)  # Make file executable
 
     def generate_cron_tasks(self):
         """Create a new cron file on the post save of a Registered Task"""
