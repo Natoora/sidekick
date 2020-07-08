@@ -30,7 +30,7 @@ class CronService:
         """
         cron_path = settings.SIDEKICK['CRON_PATH']
         with open(cron_path, 'w+') as ws_cron_file:
-            logger.info('Cron file opened at: ', settings.SIDEKICK['CRON_PATH'])
+            logger.info('Writing Sidekick Cron file: ', cron_path)
             for task in tasks:
                 logger.info('Writing task to file: ', task.name)
                 ws_cron_file.write(
