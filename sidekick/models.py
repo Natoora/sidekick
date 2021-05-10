@@ -45,7 +45,7 @@ class Task(models.Model):
             from sidekick.services.cron_files import CronService
             CronService().generate_cron_tasks()
         except Exception as e:
-            logger.error(msg='Failed to generate cron task for {} due to {}'.format(self, e))
+            logger.exception(f'Failed to generate cron task for {self.name} due to {e}')
 
     def task_of(self):
         """The app which this task belongs to """

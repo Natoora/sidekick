@@ -46,7 +46,7 @@ class CronTask:
                 logger.info(msg='Successfully ran {}'.format(self.task_name))
             except Exception as e:
                 update_task_status(registered_task_name=self.registered_task_name, status=Task.FAILED)
-                logger.error(msg=e)
+                logger.exception(f"Exception when running task=({self.registered_task_name}) exception=({e})")
             finally:
                 self.delete_lock_file()
 

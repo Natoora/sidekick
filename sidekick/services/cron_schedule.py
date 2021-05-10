@@ -24,5 +24,5 @@ class CronScheduleService:
                 logger.info(msg="{} has been disabled due to no longer having a cron schedule associated to it".format(
                     task
                 ))
-        except Exception:
-            logger.error(msg="Failed during process of disabling sidekick tasks on pre_delete of a cron schedule")
+        except Exception as e:
+            logger.exception(f"Exception when removing cron schedule exception=({e})")
