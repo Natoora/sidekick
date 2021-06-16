@@ -1,3 +1,4 @@
+import importlib
 import logging
 
 from django.apps import AppConfig
@@ -17,10 +18,14 @@ class SidekickConfig(AppConfig):
         """
         For each app listed in SIDEKICK_REGISTERED_APPS import the task to trigger the decorator
         """
-        import importlib
         try:
             for app in settings.SIDEKICK['SIDEKICK_REGISTERED_APPS']:
-                app_task = app + '.tasks'
-                importlib.import_module("%s" % app_task)
+                app_task_path = f"{app}.tasks"
+                try:
+                    importlib.import_module(app_task_path)
+                except ModuleNotFoundError:
+                    pass
+                except Exception as e:
+                    logger.exception(f"Failed to import app task exception=({e})")
         except Exception as e:
-            logger.info(f"Failed to register tasks for Side Kick exception=({e})")
+            logger.exception(f"Failed to register tasks for Side Kick exception=({e})")
