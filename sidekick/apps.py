@@ -1,5 +1,9 @@
+import logging
+
 from django.apps import AppConfig
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 class SidekickConfig(AppConfig):
@@ -12,7 +16,6 @@ class SidekickConfig(AppConfig):
     def register_tasks():
         """
         For each app listed in SIDEKICK_REGISTERED_APPS import the task to trigger the decorator
-        :return:
         """
         import importlib
         try:
@@ -20,5 +23,4 @@ class SidekickConfig(AppConfig):
                 app_task = app + '.tasks'
                 importlib.import_module("%s" % app_task)
         except Exception as e:
-            print("Failed to register tasks for Side Kick. Make sure you have SIDEKICK_REGISTERED_APPS within"
-                  " the SIDEKICK dictionary.")
+            logger.info(f"Failed to register tasks for Side Kick exception=({e})")
