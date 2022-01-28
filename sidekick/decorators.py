@@ -1,10 +1,23 @@
 import inspect
+
 from django.db import connection
+
 
 # This is here in case you have tasks decorated before running migrations
 # It will just return the original function if the table does not exist
 
-if 'sidekick_registeredtask' in connection.introspection.table_names():
+
+def db_connected():
+    from django.db import connection
+    try:
+        db_conn = True
+        connection.ensure_connection()
+    except Exception as e:
+        db_conn = False
+    return db_conn
+
+
+if db_connected() and 'sidekick_registeredtask' in connection.introspection.table_names():
 
     def sidekick_task(fn):
         """
