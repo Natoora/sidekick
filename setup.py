@@ -8,10 +8,10 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setuptools.setup(
     name="side-kick",
-    version="0.1.16",
+    version="0.1.17",
     author="Natoora Technology",
     author_email="technology@natoora.com",
-    description="A lightweight task runner for django with easy admin controls",
+    description="Cron-based task runner for django with easy admin controls",
     long_description=long_description,
     long_description_content_type='text/markdown',
     url="https://github.com/Natoora/sidekick",
