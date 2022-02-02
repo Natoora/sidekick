@@ -1,6 +1,8 @@
 import inspect
 import logging
 
+from .models import RegisteredTask
+
 logger = logging.getLogger(__name__)
 
 
@@ -12,7 +14,6 @@ def sidekick_task(fn):
     :param: fn, Any function you want to run as a task
     :return: The original function
     """
-    from sidekick.models import RegisteredTask
     try:
         src = inspect.getsource(fn)
         module_name = inspect.getmodule(fn).__name__.split('.')[0]
