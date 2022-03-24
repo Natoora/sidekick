@@ -27,6 +27,20 @@ python manage.py test
 
 ---
 
+## Publishing
+
+#### Tag the version
+Create a tag on GitHub with the new version name (e.g. 0.1.1)
+
+#### Dependent Projects
+Everything after the '@' specifies a tag or branch
+```shell
+# requirements.txt
+git+https://github.com/Natoora/sidekick.git@0.1.17
+```
+
+---
+
 ## Usage
 
 #### Install
