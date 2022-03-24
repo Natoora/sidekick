@@ -92,7 +92,11 @@ class CronSchedule(models.Model):
 class RegisteredTask(models.Model):
     """Model for the registered task to be used by the Task Model """
 
-    task_name = models.CharField(max_length=125, help_text='The task to be run ie. stock --get_stock_updates')
+    task_name = models.CharField(
+        max_length=125,
+        help_text='The task to be run ie. stock --get_stock_updates',
+        unique=True
+    )
 
     def __str__(self):
         return self.task_name.replace('--', ' - ').replace('_', ' ')
