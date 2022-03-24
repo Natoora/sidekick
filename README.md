@@ -1,78 +1,78 @@
-# Side Kick
+# Sidekick
 
-Side Kick is a simple scheduler for Django management commands.  Simply create the task, add the decorator and then 
+Sidekick is a simple scheduler for Django management commands.  Simply create the task, add the decorator and then 
 set when it should run from Django's admin. 
 
-
-Installation:
-
-``pip install git+https://github.com/Natoora/sidekick.git``
-
-Make sure you add ``sidekick`` to your installed apps.
-
-Add the following to your settings file:
-
-    SIDEKICK = {
-        'SIDEKICK_REGISTERED_APPS': [],
-        'ENVIRONMENT': "",
-        'DJANGO_PATH': "",
-        'CRON_PATH': "",
-        'LOCK_PATH': ""
-    }
+![Side Kick Admin Example](./sidekick/static/images/SideKickAdmin.png?raw=true "Side Kick Admin Example")
 
 
-``SIDEKICK_REGISTERED_APPS`` is where you will need to define all the apps which have tasks that sidekick will handle.
-You just need to put the app name and then as soon as django loads it will import the tasks.py file of each app within
-this list. Any tasks that have the ``@sidekick_task`` decorator will create a new RegisteredTask instance if it does
-not already exist.
+---
 
-Each time you want to register a new task, don't forget to add it to this list.
-``SIDEKICK_REGISTERED_APPS = ['stock', 'customers', 'pizzas',]``
+## Development
 
-``ENVIRONMENT`` is where you will define the user and the start-up file of that user for example:
+#### Install requirements
+```shell
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
-    ENVIRONMENT = "root . /root/.profile"
+#### Management
+Use the `manage.py` file as you would in a normal Django project.  
+It has been configured with the basic settings to make migrations and run tests.
+```shell
+python manage.py makemigrations
+python manage.py test
+```
 
-`DJANGO_PATH` is the path to your project directory and then the path to python, followed by the manage.py command
-which will be used to trigger the tasks. For example:
+---
 
-    DJANGO_PATH = "/var/www/myproject && /var/www/virtualenv/bin/python manage.py"
+## Usage
 
+#### Install
+```shell
+pip install git+https://github.com/Natoora/sidekick.git
+```
 
-``CRON_PATH`` is the path to the tasks.txt file that you created earlier. This is where the cron files will be written,
-so you can check within this file once you have registered a task that it is working correctly.
+#### Add to installed apps
+```python
+INSTALLED_APPS = [
+    ...,
+    sidekick
+]
+```
 
-    CRON_PATH = "/var/www/myproject/sidekick_tasks/tasks.txt"
+#### Add Sidekick settings
 
+```python
+from django.conf import settings
 
-``LOCK_FILE`` is the path to a directory where the lock files will be created when a task starts running and then deleted
-from when it is completed. The reason for this is to stop the same task running concurrently if the first instance of 
-the task hasn't completed yet. This also can go anywhere but for ease of use I would suggest keeping it within the same
-directory you choose to create the tasks.txt file.
+SIDEKICK = {
+    "SIDEKICK_REGISTERED_APPS": settings.CUSTOM_APPS_LIST,  # List of apps to search for tasks in
+    "MANAGE_PATH": "/code/manage.py",  # Path to manage.py from base dir
+    "CRON_PATH": "/var/spool/cron/crontabs/root",  # Path for Cron file 
+    "LOCK_PATH": "/sidekick/lock_files/",  # Path to store lock files 
+}
+```
 
-    LOCK_PATH = "/var/www/myproject/sidekick_tasks/lock_files/"
+#### Run migrations
+```shell
+./manage.py migrate
+```
 
-These settings were designed so you can customise them and use different paths depending on the environment you are
-working in etc.
+#### Register Tasks
+Functions must be in a `tasks.py` file in the root of a registered app with the `@sidekick_task` decorator.
+```python
+# app/tasks.py
 
-Once this is done, you will need to migrate to create the side kick models which you can then manage 
-through the django admin.
+from sidekick.decorators import sidekick_task
 
-The basic set up is now complete!
+@sidekick_task
+def my_new_task():
+    ...
+```
 
-When it comes to creating and registering tasks, follow these simple steps:
-
-Add the ``@sidekick_task`` decorator to any tasks you wish to register, make sure the task is in your tasks.py file of your
-app:
-
-    from sidekick.decorators import sidekick_task
-
-    @sidekick_task
-    def my_task():
-        # Whatever task you wish to complete
-        ...
-
-Then add the name of the app to the ``SIDEKICK_REGISTERED_APPS`` list in your settings file.
+#### Setup management command
 
 Create a new directory within the app called ``management`` and then a subdirectory called `commands`. Add a
 ``__init__.py`` file and then a file with the name of the app eg. ``customers.py`` to the ``commands`` directory.
@@ -91,63 +91,47 @@ File structure would be as follows:
 
 Within ``customers.py`` (or whatever your app is) add the following:
 
+```python
+import logging
 
-    import logging
+from django.core.management.base import BaseCommand
+from sidekick.services.helpers import get_task_name, get_app_name
+from sidekick.services.crontab import CronTask
 
-    from django.core.management.base import BaseCommand
-    from sidekick.services.helpers import get_task_name, get_app_name
-    from sidekick.services.crontab import CronTask
+from sidekick.models import RegisteredTask
 
-    from sidekick.models import RegisteredTask
-
-    logger = logging.getLogger(__name__)
-    app_name = get_app_name(__name__)
+logger = logging.getLogger(__name__)
+app_name = get_app_name(__name__)
 
 
-    class Command(BaseCommand):
-        help = "Commands for the Stock app"
+class Command(BaseCommand):
+    help = "Commands for the Stock app"
 
-        def add_arguments(self, parser):
-            """Defines the arguments """
+    def add_arguments(self, parser):
+        """Defines the arguments """
 
-            for task in RegisteredTask.objects.filter(task_name__startswith=app_name):
-                task_name = task.task_name.split(' ')[1]
-                parser.add_argument(
-                    task_name,
-                    action='store_true',
-                    dest=task_name[2:]
-                )
+        for task in RegisteredTask.objects.filter(task_name__startswith=app_name):
+            task_name = task.task_name.split(' ')[1]
+            parser.add_argument(
+                task_name,
+                action='store_true',
+                dest=task_name[2:]
+            )
 
-        def handle(self, *args, **options):
-            """Handle stock management commands.
+    def handle(self, *args, **options):
+        """Handle stock management commands.
 
-            :param args:
-            :param options: Arguments passed with command e.g. send_emails_to_customers, verbosity etc.
-            """
-            task_name = get_task_name(options)
-            rt_task_name = "{} --{}".format(app_name, task_name)
+        :param args:
+        :param options: Arguments passed with command e.g. send_emails_to_customers, verbosity etc.
+        """
+        task_name = get_task_name(options)
+        rt_task_name = "{} --{}".format(app_name, task_name)
 
-            if RegisteredTask.objects.filter(task_name=rt_task_name):
-                try:
-                    CronTask(task_name=task_name, registered_task_name=rt_task_name, app=app_name).run()
-                except Exception as e:
-                    logger.error(msg=e)
-
+        if RegisteredTask.objects.filter(task_name=rt_task_name):
+            try:
+                CronTask(task_name=task_name, registered_task_name=rt_task_name, app=app_name).run()
+            except Exception as e:
+                logger.error(msg=e)
+```
 
 You will need to have this same file structure in each app you want to have tasks registered to.
- 
-Once this is done, you need to create a file within the ``/etc/cron.d`` directory called anything you like, I would
-suggest something like ``sidekick_tasks``, and then create a sym link between this file and the tasks.txt file you
-created earlier.
-
-You can do this by connecting to your server and then:
-
-    cd /etc/cron.d
-    touch sidekick_tasks
-    ln -sf /var/www/myproject/path/to/tasks.txt /etc/cron.d/sidekick_tasks
-    
-Once this is done then you're all good to go, you can now register tasks with a simple decorator and easily 
-manage them using django admin.
-
-
-![Side Kick Admin Example](./sidekick/static/images/SideKickAdmin.png?raw=true "Side Kick Admin Example")
