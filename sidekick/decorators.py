@@ -17,13 +17,7 @@ def sidekick_task(fn):
         src = inspect.getsource(fn)
         module_name = inspect.getmodule(fn).__name__.split('.')[0]
         task_string = src.split('(')[0][17:].replace('f ', '{} --'.format(module_name))
-        try:
-            RegisteredTask.objects.get(task_name=task_string)
-        except RegisteredTask.DoesNotExist:
-            st = RegisteredTask()
-            st.task_name = task_string
-            st.save()
-        return fn
+        RegisteredTask.objects.get_or_create(task_name=task_string)
     except Exception as e:
         logger.info(f"Problem registering sidekick_task decorator: {e}")
-        return fn
+    return fn
