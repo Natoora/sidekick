@@ -3,3 +3,4 @@ dist/
 side_kick.egg-info/
 .idea
 venv
+__pycache__/
