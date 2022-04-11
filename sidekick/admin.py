@@ -43,7 +43,6 @@ class TaskAdmin(admin.ModelAdmin):
     Admin for the task model
     """
 
-    resource_class = TaskResource
     list_display = ['name', 'registered_task', 'status', 'running_for', 'cron_schedule', 'enabled']
 
 
