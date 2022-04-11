@@ -1,7 +1,6 @@
 from django.contrib import admin
 from sidekick.models import Task, CronSchedule
 from import_export import resources
-from import_export.admin import ImportExportModelAdmin
 
 
 class CronScheduleResource(resources.ModelResource):
@@ -12,12 +11,11 @@ class CronScheduleResource(resources.ModelResource):
         model = CronSchedule
 
 
-class CronScheduleAdmin(admin.ModelAdmin, ImportExportModelAdmin):
+class CronScheduleAdmin(admin.ModelAdmin):
     """
     Admin for the CronSchedule
     """
 
-    resource_class = CronScheduleResource
     model = CronSchedule
     fields = (
         'name',
